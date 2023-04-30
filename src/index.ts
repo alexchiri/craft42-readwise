@@ -135,43 +135,12 @@ const insertHighlights = async (bookId : string) => {
   if(bookInfo.author) 
     output.push( { type: "textBlock",  content: [ { text: "Author:", isBold: true}, {text: " " + bookInfo.author}]} );
 
-  if(bookInfo.category) 
-    output.push( { type: "textBlock",  content: [ { text: "Category:", isBold: true}, {text: " " + bookInfo.category}]} );
-
-  if(bookInfo.source_url) 
-    output.push( { type: "textBlock",  content: [ { text: "Source: ", isBold: true}, 
-                 { text: bookInfo.source_url,  link: {type: "url", url: bookInfo.source_url} }] });
-
-  if(bookInfo.tags.length>0) {    
-    const tags = bookInfo.tags.map((t:any)=> "#" + t.name).join(" ");
-    output.push( { type: "textBlock", content: [ { text: "Tags:", isBold: true}, {text: " " + tags}]} );
-  }
-  output.push( { type: "textBlock",  content: [ { text: "Import Date:", isBold: true}, {text: " " + (new Date()).toLocaleDateString() + " " + (new Date()).toLocaleTimeString() }]} );
-
-  if(bookInfo.last_highlight_at && bookInfo.last_highlight_at != "")
-    output.push( { type: "textBlock",  content: [ { text: "Last Highlight Date:", isBold: true}, {text: " " + (new Date(bookInfo.last_highlight_at)).toLocaleDateString() + " " + (new Date(bookInfo.last_highlight_at)).toLocaleTimeString() }]} );
-
-  output.push( { type: "textBlock",  content: [{ text: `Total Highlights: `, isBold: true}, { text: `${bookInfo.num_highlights}`}]} );
-
   const bulletStyle = craft.blockFactory.defaultListStyle("bullet");
-  let lastGroupDate: string;
   const allHighlights = highlights.results.reverse().forEach( (highlight:any) => {
-    const highlightDate: Date = new Date(highlight.highlighted_at);
-    if(lastGroupDate!==getFormattedDate(highlightDate)) {
-      lastGroupDate = getFormattedDate(highlightDate);
-      output.push( { type: "textBlock",
-      content: [
-          { 
-            text: getFormattedDate(highlightDate),
-            link: {type:"dateLink", date: getFormattedDate(highlightDate) }
-          }
-       ]} 
-      );
-    }
     output.push( 
       craft.blockFactory.textBlock({
         listStyle: bulletStyle,
-        indentationLevel: 1,
+        indentationLevel: 0,
         content: [
           { text: highlight.text + " " },
           { text: "link", link: { type: "url",
@@ -181,10 +150,10 @@ const insertHighlights = async (bookId : string) => {
       })
     );
     if(highlight.note!="") 
-      output.push( craft.blockFactory.textBlock({ listStyle: bulletStyle, indentationLevel: 2, content: [{text: `Notes: ${highlight.note}`}] }) );
+      output.push( craft.blockFactory.textBlock({ listStyle: bulletStyle, indentationLevel: 1, content: [{text: `Notes: ${highlight.note}`}] }) );
     if(highlight.tags.length>0) { 
       const tags = highlight.tags.map((t:any)=> "#" + t.name).join(" ");
-      output.push( craft.blockFactory.textBlock({ listStyle: bulletStyle, indentationLevel: 2, content: [{text: `Tags: ${tags}`}] }) );
+      output.push( craft.blockFactory.textBlock({ listStyle: bulletStyle, indentationLevel: 1, content: [{text: `Tags: ${tags}`}] }) );
     }
   });
   console.log(output);
